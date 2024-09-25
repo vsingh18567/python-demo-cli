@@ -116,8 +116,8 @@ def main() -> None:
         generate_readings_single_write,
         generate_readings_multi_process,
     ]
-    sizes = [10**i for i in range(3, 8)]
-    benchmark_results = benchmark(sizes, FUNCS)  # type: ignore
+    SIZES = [10**i for i in range(3, 8)]
+    benchmark_results = benchmark(SIZES, FUNCS)  # type: ignore
     pretty_print(benchmark_results)
 
 
