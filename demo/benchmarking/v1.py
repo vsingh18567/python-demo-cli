@@ -3,7 +3,6 @@ from math import sqrt
 import os
 import time
 from typing import Callable, Sequence
-
 from reading.v3 import (
     generate_readings_batch_write,
     generate_readings_fast,

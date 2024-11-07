@@ -67,10 +67,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-def use_int(n: float) -> int:
-    if n > 0:
-        return int(n)
-    return n
-use_int("hello")

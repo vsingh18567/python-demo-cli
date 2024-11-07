@@ -1,10 +1,15 @@
+from collections import defaultdict
 from dataclasses import dataclass
+import json
 from math import sqrt
-import os
 import time
 from typing import Callable, Sequence
+import sys
+import os
 
-from reading.v3 import (
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from demo.reading.v3 import (
     generate_readings_batch_write,
     generate_readings_fast,
     generate_readings_multi_process,
@@ -77,8 +82,9 @@ def benchmark(
     return times
 
 
-def pretty_print(benchmark_results: dict[int, dict[str, Stats]]) -> None:
+def pretty_print_and_dump(benchmark_results: dict[int, dict[str, Stats]]) -> None:
     print("\n" * 5)
+    json_data = defaultdict(dict)
     for size, stats in benchmark_results.items():
         print(f"Results for size {size}")
         data = list(stats.items())
@@ -103,7 +109,10 @@ def pretty_print(benchmark_results: dict[int, dict[str, Stats]]) -> None:
                     f"{(stat.time_per_row * 1_000_000):.2f}",
                 ]
             )
+            json_data[size][func_name] = stat.__dict__
         print(tabulate(tabulated_data, headers=headers, tablefmt="fancy_grid"))
+    with open("benchmark_results.json", "w") as f:
+        json.dump(json_data, f, indent=2)
 
 
 def main() -> None:
@@ -115,9 +124,9 @@ def main() -> None:
         generate_readings_single_write,
         generate_readings_multi_process,
     ]
-    SIZES = [10**i for i in range(3, 5)]
+    SIZES = [10**i for i in range(3, 8)]
     benchmark_results = benchmark(SIZES, FUNCS)  # type: ignore
-    pretty_print(benchmark_results)
+    pretty_print_and_dump(benchmark_results)
 
 
 if __name__ == "__main__":
