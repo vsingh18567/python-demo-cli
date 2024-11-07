@@ -4,11 +4,10 @@ import os
 import time
 from typing import Callable, Sequence
 
-from reading import (
+from reading.v3 import (
     generate_readings_batch_write,
     generate_readings_fast,
     generate_readings_multi_process,
-    generate_readings_numpy,
     generate_readings_single_write,
     generate_readings_trash,
 )
@@ -19,12 +18,13 @@ NUM_RUNS = 5
 GeneratingFunc = Callable[[int, int, str], None]
 
 
-def _benchmark_once(n: int, num_patients: int, function: GeneratingFunc) -> float:
+def _benchmark_once(n: int, function: GeneratingFunc) -> float:
+    output_file = f"{function.__name__}_{n}.csv"
     start = time.time()
-    output_file = f"{function.__name__}_{n}_{num_patients}.csv"
-    function(n, num_patients, output_file)
+    function(n, n // 10, output_file)
+    duration = time.time() - start
     os.remove(output_file)
-    return time.time() - start
+    return duration
 
 
 def benchmark_with_size(
@@ -37,7 +37,7 @@ def benchmark_with_size(
         times_for_func = []
         print(f"\tBenchmarking {func.__name__}")
         for _ in range(NUM_RUNS):
-            times_for_func.append(_benchmark_once(n, n // 10, func))
+            times_for_func.append(_benchmark_once(n, func))
         print(f"\t{sum(times_for_func) / NUM_RUNS:.4f} s")
         times[func.__name__] = times_for_func
     return times
@@ -111,12 +111,11 @@ def main() -> None:
     FUNCS = [
         generate_readings_trash,
         generate_readings_fast,
-        generate_readings_numpy,
         generate_readings_batch_write,
         generate_readings_single_write,
         generate_readings_multi_process,
     ]
-    SIZES = [10**i for i in range(3, 8)]
+    SIZES = [10**i for i in range(3, 5)]
     benchmark_results = benchmark(SIZES, FUNCS)  # type: ignore
     pretty_print(benchmark_results)
 

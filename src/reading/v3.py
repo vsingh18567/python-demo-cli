@@ -46,7 +46,7 @@ def generate_readings_trash(n: int, num_patients: int, output_file: str) -> None
         f.write("id,timestamp,patient_id,spo2,hr,bp\n")
     for i in custom_tqdm(range(n)):
         reading = _generate_reading(i, num_patients)
-        with open(output_file, "w") as f:
+        with open(output_file, "a") as f:
             f.write(reading.to_csv())
 
 
@@ -83,20 +83,6 @@ def generate_readings_fast(n: int, num_patients: int, output_file: str) -> None:
             )
 
 
-def generate_readings_numpy(n: int, num_patients: int, output_file: str) -> None:
-    readings = np.zeros((n, 6))
-    readings[:, 0] = np.arange(n)
-    readings[:, 1] = np.random.randint(*TIME_RANGE, n)
-    readings[:, 2] = np.random.randint(0, num_patients, n)
-    readings[:, 3] = np.random.uniform(*SPO2_RANGE, n)
-    readings[:, 4] = np.random.uniform(*HR_RANGE, n)
-    readings[:, 5] = np.random.uniform(*BP_RANGE, n)
-    with open(output_file, "w") as f:
-        f.write("id,timestamp,patient_id,spo2,hr,bp\n")
-        for r in readings:
-            f.write(f"{int(r[0])},{int(r[1])},{int(r[2])},{r[3]},{r[4]},{r[5]}\n")
-
-
 def _helper(n: int, num_patients: int, return_list: list[Reading]) -> None:
     for i in range(n):
         return_list.append(_generate_reading(i, num_patients))
@@ -130,7 +116,6 @@ def main() -> None:
     mode_to_func = {
         "trash": generate_readings_trash,
         "fast": generate_readings_fast,
-        "numpy": generate_readings_numpy,
         "batch_write": generate_readings_batch_write,
         "single_write": generate_readings_single_write,
         "multi_process": generate_readings_multi_process,
