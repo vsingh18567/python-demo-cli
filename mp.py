@@ -4,12 +4,17 @@ from multiprocessing import Process, cpu_count
 import time
 
 
+RANGE = (0, 1000)
+NUM_PER_PROCESS = 1000000
+
+
 def gen_random(totals, i):
     local_total = 0
-    for _ in range(1000000):
-        local_total += random.randint(0, 1000)
+    for _ in range(NUM_PER_PROCESS):
+        local_total += random.randint(*RANGE)
     totals[i] = local_total
-    
+
+
 if __name__ == "__main__":
     NUM_PROCESSES = cpu_count()
     processes = []
@@ -24,6 +29,6 @@ if __name__ == "__main__":
     total = sum(totals)
     print(f"Multi Process Time taken: {time.time() - start}")
     start = time.time()
-    for i in range(1000000 * NUM_PROCESSES):
-        total += random.randint(0, 1000)
+    for i in range(NUM_PER_PROCESS * NUM_PROCESSES):
+        total += random.randint(*RANGE)
     print(f"Single Process Time taken: {time.time() - start}")
